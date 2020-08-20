@@ -1252,4 +1252,5 @@ config TOUCHSCREEN_FT5X06
           If unsure, say N.
 
 source "drivers/input/touchscreen/ilitek_touch/Kconfig"
+source "drivers/input/touchscreen/egalax_touch/Kconfig"
 endif
