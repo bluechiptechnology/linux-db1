@@ -1,0 +1,85 @@
+
+#include "apq8016-sbc.dts"
+
+/* Development DTS for testing various features */
+
+&lvds {
+	clock-frequency = <33264000>;
+	hactive = <800>;
+	vactive = <480>;
+	hback-porch = <0>;
+	hfront-porch = <246>;
+	vback-porch = <0>;
+	vfront-porch = <35>;
+	hsync-len = <10>;
+	vsync-len = <10>;
+	hsync-active = <0>;
+	vsync-active = <0>;
+	de-active = <1>;
+	pixelclk-active = <0>;
+};
+
+
+&dsi_lvds_bridge {
+    /* MSB bits in 4th LVDS lane */
+    ti,lvds-format = <2>;
+
+	ti,width-mm = <152>;
+	ti,height-mm = <91>;
+};
+
+
+&dsi0_out {
+	remote-endpoint = <&sn65dsi83_in>;
+	data-lanes = <0 1 2 3>;
+};
+
+/* resistive touch screen */
+&tsc2046{
+	status = "disabled";
+	//debug_touch;
+	calibrated_xmin = /bits/ 16 <129>;
+	calibrated_xmax = /bits/ 16 <4077>;
+	calibrated_ymin = /bits/ 16 <175>;
+	calibrated_ymax = /bits/ 16 <3658>;
+	swapx;
+	//swapy;
+};
+
+/* focaltech touch screen, note: multitouch does not work */
+&pcap {
+	status = "okay";
+	xresolution = /bits/ 16 <800>;
+	yresolution = /bits/ 16 <480>;
+};
+
+
+/* camera support */
+
+&csiphy1_ep
+{
+	status = "okay";
+};
+
+&ov5640_2_ep
+{
+	status = "okay";
+};
+
+&camera_front
+{
+	status = "okay";
+};
+
+
+&spi2uart {
+	status = "okay";
+};
+
+/*
+&xr20m1170 {
+	status = "okay";
+};
+*/
+
+

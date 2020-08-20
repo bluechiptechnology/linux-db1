@@ -1,0 +1,677 @@
+/*
+ * Copyright (c) 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "msm8916.dtsi"
+#include "pm8916.dtsi"
+#include "apq8016-sbc-soc-pins.dtsi"
+#include "apq8016-sbc-pmic-pins.dtsi"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/sound/apq8016-lpass.h>
+
+/ {
+	aliases {
+		serial0 = &blsp1_uart2;
+		serial1 = &blsp1_uart1;
+		usid0 = &pm8916_0;
+		i2c0	= &blsp_i2c2;
+		i2c1	= &blsp_i2c6;
+		i2c3	= &blsp_i2c4;
+		spi0	= &blsp_spi5;
+		spi1	= &blsp_spi3;
+	};
+
+	chosen {
+		stdout-path = "serial0";
+	};
+
+	reserved-memory {
+		ramoops@bff00000{
+			compatible = "ramoops";
+			reg = <0x0 0xbff00000 0x0 0x100000>;
+
+			record-size = <0x20000>;
+			console-size = <0x20000>;
+			ftrace-size = <0x20000>;
+		};
+	};
+
+
+    backlight_5v0: fixedregulator@3 {
+        compatible = "regulator-fixed";
+        regulator-name = "backlight_5v0";
+        regulator-min-microvolt = <5000000>;
+        regulator-max-microvolt = <5000000>;
+        regulator-always-on;
+        status = "okay";
+    };
+
+    backlight_lcd: backlight {
+        compatible = "pwm-backlight";
+        pwms = <&blpwm 0 50000 >;
+		brightness-levels = < 0  1  2  3  4  5  6  7  8  9
+				     10 11 12 13 14 15 16 17 18 19
+				     20 21 22 23 24 25 26 27 28 29
+				     30 31 32 33 34 35 36 37 38 39
+				     40 41 42 43 44 45 46 47 48 49
+				     50 51 52 53 54 55 56 57 58 59
+				     60 61 62 63 64 65 66 67 68 69
+				     70 71 72 73 74 75 76 77 78 79
+				     80 81 82 83 84 85 86 87 88 89
+				     90 91 92 93 94 95 96 97 98 99
+				    100>;
+		default-brightness-level = <90>;
+        power-supply = <&backlight_5v0>;        
+        status = "okay";
+    };
+
+
+	soc {
+		dma@7884000 {
+			status = "okay";
+		};
+
+		serial@78af000 {
+			label = "LS-UART0";
+			status = "okay";
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&blsp1_uart1_default>;
+			pinctrl-1 = <&blsp1_uart1_sleep>;
+		};
+
+		serial@78b0000 {
+			label = "LS-UART1";
+			status = "okay";
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&blsp1_uart2_default>;
+			pinctrl-1 = <&blsp1_uart2_sleep>;
+		};
+
+		/* I2C-0 */
+		i2c@78b6000 {
+		/* On Low speed expansion */
+			label = "LS-I2C0";
+			status = "okay";
+
+			/* RTC */
+			rtc: pcf8523@66 {
+                compatible = "nxp,pcf8523";
+                reg = <0x68>;
+			};
+
+			/* Temperature sensor */
+			temp: tmp432a@4c {
+                compatible = "ti,tmp432", "tmp401";
+                reg = <0x4c>;
+			};
+		};
+
+		/* I2C-3 */
+		i2c@78b8000 {
+		/* On High speed expansion */
+			label = "HS-I2C2";
+			status = "okay";
+
+            /* capacitive touch screens */
+
+            pcap: ft5x06@38 {
+                compatible = "focaltech,ft5x06";
+                reg = <0x38>;
+                interrupt-parent = <&msmgpio>;
+                interrupts = <21 0>;
+                reset-gpio = <&msmgpio 60 1>;
+                linux,wakeup;
+                status = "disabled";
+            };
+
+            pcap2: ilitek@41 {
+                compatible = "tchip,ilitek";
+                reg = <0x41>;
+                interrupt-parent = <&msmgpio>;
+                interrupts = <21 0>;
+                touch-gpio = <&msmgpio 21 0>;
+                reset-gpio = <&msmgpio 60 1>;
+                linux,wakeup;
+                status = "disabled";
+            };
+
+            pcap3: eeti@2a {
+                compatible = "eeti,egalax_i2c";
+                reg = <0x2A>;
+                interrupt-parent = <&msmgpio>;
+                interrupts = <21 0>;
+                int-gpios = <&msmgpio 21 0>;
+                linux,wakeup;
+                status = "disabled";
+            };
+
+            /* DSI to LVDS bridge */
+			dsi_lvds_bridge: sn65dsi83@2c {
+				compatible = "ti,sn65dsi83";
+				reg = <0x2c>;
+				ti,dsi-lanes = <4>;
+				ti,lvds-format = <1>;
+				ti,lvds-bpp = <24>;
+				ti,width-mm = <197>;
+				ti,height-mm = <147>;
+				enable-gpios = <&msmgpio 97 GPIO_ACTIVE_HIGH>;
+				pinctrl-names = "default", "sleep";
+				pinctrl-0 = <&sn65dsi83_int_active>;
+				pinctrl-1 = <&sn65dsi83_int_suspend>;
+				status = "okay";
+
+                backlight = <&backlight_lcd>;
+
+				ports {
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					port@0 {
+						reg = <0>;
+						sn65dsi83_in: endpoint {
+							remote-endpoint = <&dsi0_out>;
+						};
+					};
+				};
+
+				/* timings set individually in board specific DTS files */
+				display-timings {
+
+					lvds:lvds{
+					};
+
+				};
+				
+			};
+		};
+
+		/* I2C-1 */
+		i2c@78ba000 {
+		/* On Low speed expansion */
+			label = "LS-I2C1";
+			status = "okay";
+		};
+
+		spi@78b7000 {
+		/* On High speed expansion */
+			label = "HS-SPI1";
+			status = "okay";
+			num-cs = <2>;
+			cs-gpios = <&msmgpio 10 GPIO_ACTIVE_LOW>,
+                       <&msmgpio 69 GPIO_ACTIVE_LOW>;
+			spi-max-frequency = <200000>;
+
+			/* resistive touch screen */
+			tsc2046: tsc2046@0 {
+				compatible = "ti,tsc2046";
+				reg = <0>;
+				spi-max-frequency = <200000>;
+				pinctrl-names ="default";
+				pinctrl-0 = <&restouch_int_active>;
+				interrupt-parent = <&msmgpio>;
+				interrupts = <20 0>;
+				pendown-gpio = <&msmgpio 20 GPIO_ACTIVE_HIGH>;
+				ti,x-min = /bits/ 16 <0>;
+				ti,x-max = /bits/ 16 <0>;
+				ti,y-min = /bits/ 16 <0>;
+				ti,y-max = /bits/ 16 <0>;
+				ti,pressure-max = /bits/ 16 <0>;
+				ti,x-plate-ohms = /bits/ 16 <400>;
+				wakeup-source;
+			};
+
+		};
+
+		/* for calculating baud rate out of 24MHz crystal */
+		spi2uart_clk: spi2uart_clk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <24000000>;
+			clock-accuracy = <100>;
+		};
+
+		spi@78b9000 {
+		/* On Low speed expansion */
+			label = "LS-SPI0";
+			status = "okay";
+			spi-max-frequency = <1000000>;
+			
+			num-cs = <1>;
+			cs-gpios = <&msmgpio 18 GPIO_ACTIVE_LOW>;
+
+			spi2uart: spi2uart@0 {
+				status = "disabled";
+				compatible = "exar,xrm117x";
+				reg = <0>; /* CS #0 */
+				clocks = <&spi2uart_clk>;
+				interrupt-parent = <&msmgpio>;
+				interrupts = <25 0>; /* IRQ_TYPE_EDGE_FALLING */
+				spi-max-frequency = <1000000>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&xr20m1170_int_active>;
+			};
+		};
+
+		sdhci@07824000 {
+			vmmc-supply = <&pm8916_l8>;
+			vqmmc-supply = <&pm8916_l5>;
+
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&sdc1_clk_on &sdc1_cmd_on &sdc1_data_on>;
+			pinctrl-1 = <&sdc1_clk_off &sdc1_cmd_off &sdc1_data_off>;
+			status = "okay";
+		};
+
+		sdhci@07864000 {
+			vmmc-supply = <&pm8916_l11>;
+			vqmmc-supply = <&pm8916_l12>;
+
+			pinctrl-names = "default", "sleep";
+			pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on &sdc2_cd_on>;
+			pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off &sdc2_cd_off>;
+
+			cd-gpios = <&msmgpio 38 0x1>;
+			status = "okay";
+		};
+
+		usb@78d9000 {
+			extcon = <&usb_id>, <&usb_id>;
+			status = "okay";
+			adp-disable;
+			hnp-disable;
+			srp-disable;
+			dr_mode = "otg";
+			pinctrl-names = "default", "device";
+			pinctrl-0 = <&usb_sw_sel_pm &usb_hub_reset_pm &usb_eth_default>;
+			pinctrl-1 = <&usb_sw_sel_pm_device &usb_hub_reset_pm_device &usb_eth_off>;
+			ulpi {
+				phy {
+					v1p8-supply = <&pm8916_l7>;
+					v3p3-supply = <&pm8916_l13>;
+					extcon = <&usb_id>;
+				};
+			};
+		};
+
+		mdss@1a00000 {
+			status = "okay";
+
+			mdp@1a01000 {
+				status = "okay";
+			};
+
+			dsi@1a98000 {
+				status = "okay";
+
+				vdda-supply = <&pm8916_l2>;
+				vddio-supply = <&pm8916_l6>;
+
+			};
+
+			dsi-phy@1a98300 {
+				status = "okay";
+
+				vddio-supply = <&pm8916_l6>;
+			};
+		};
+
+		lpass_codec: codec{
+			status = "okay";
+		};
+
+		lpass@07708000 {
+			status = "okay";
+		};
+
+		/*
+		Internal Codec
+			playback - Primary MI2S
+			capture - Ter MI2S
+
+		External Primary:
+			playback - secondary MI2S
+			capture - Quat MI2S
+
+		External Secondary:
+			playback - Quat MI2S
+			capture - Quat MI2S
+
+		*/
+
+                sound: sound {
+                        compatible = "qcom,apq8016-sbc-sndcard";
+                        reg = <0x07702000 0x4>, <0x07702004 0x4>;
+                        reg-names = "mic-iomux", "spkr-iomux";
+
+                        status = "okay";
+
+                        pinctrl-0 = <&cdc_pdm_lines_act &ext_mclk_tlmm_lines_act>;
+                        pinctrl-1 = <&cdc_pdm_lines_sus &ext_mclk_tlmm_lines_sus>;
+
+                        pinctrl-names = "default", "sleep";
+                        qcom,model = "DB1";
+                        qcom,audio-routing =	
+								"AMIC2", "MIC BIAS Internal2",
+								"AMIC3", "MIC BIAS External1";
+                                
+
+
+                        internal-codec-playback-dai-link@0 {            /* I2S - Internal codec */
+                                link-name = "WCD";
+                                cpu {  /* PRIMARY */
+                                        sound-dai = <&lpass MI2S_PRIMARY>;
+                                };
+                                codec {
+                                        sound-dai = <&lpass_codec 0>, <&wcd_codec 0>;
+                                };
+
+                        };
+
+                        internal-codec-capture-dai-link@0 {             /* I2S - Internal codec */
+                                link-name = "WCD-Capture";
+                                cpu { /* PRIMARY */
+                                        sound-dai = <&lpass MI2S_TERTIARY>;
+                                };
+                                codec {
+                                        sound-dai = <&lpass_codec 1>, <&wcd_codec 1>;
+                                };
+                        };
+                };
+
+		spmi@200f000 {
+			pm8916@1 {
+				blpwm: pwm@bc00 {
+					status = "okay";
+
+					pinctrl-names = "default";
+					pinctrl-0 = <&ls_exp_gpio_f>;
+				};
+			};
+		};
+
+		wcnss@a21b000 {
+			status = "okay";
+		};
+
+		camera_vdddo_1v8: fixedregulator@0 {
+			compatible = "regulator-fixed";
+			regulator-name = "camera_vdddo";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+		};
+
+		camera_vdda_2v8: fixedregulator@1 {
+			compatible = "regulator-fixed";
+			regulator-name = "camera_vdda";
+			regulator-min-microvolt = <2800000>;
+			regulator-max-microvolt = <2800000>;
+			regulator-always-on;
+		};
+
+		camera_vddd_1v5: fixedregulator@2 {
+			compatible = "regulator-fixed";
+			regulator-name = "camera_vddd";
+			regulator-min-microvolt = <1500000>;
+			regulator-max-microvolt = <1500000>;
+			regulator-always-on;
+		};
+
+		cci@1b0c000 {
+			status = "okay";
+			clock-frequency = <100000>;
+
+			camera_front: camera_front@3c {
+				compatible = "ovti,ov5640";
+				reg = <0x3c>; /* 3c or 7C ? */
+
+				/*
+				reset-gpios = <&msmgpio 33 GPIO_ACTIVE_LOW>;
+				*/
+				
+				powerdown-gpios = <&msmgpio 28 GPIO_ACTIVE_HIGH>;
+
+				pinctrl-names = "default";
+				pinctrl-0 = <&camera_front_default>;
+
+				clocks = <&gcc GCC_CAMSS_MCLK0_CLK>;
+				clock-names = "xclk";
+				clock-frequency = <23880000>;
+
+				/*
+				DOVDD-supply = <&camera_vdddo_1v8>;
+				AVDD-supply = <&camera_vdda_2v8>;
+				DVDD-supply = <&camera_vddd_1v5>;
+				*/
+				
+
+				DOVDD-supply = <&camera_vdddo_1v8>;
+				AVDD-supply = <&pm8916_l10>;
+				DVDD-supply = <&camera_vddd_1v5>;
+
+				/*
+				status = "disabled";
+				*/
+				
+				port {
+					ov5640_2_ep: endpoint {
+						clock-lanes = <1>;
+						data-lanes = <0 2>;
+						remote-endpoint = <&csiphy1_ep>;
+					};
+				};
+			};
+		};
+
+		camss@1b00000 {
+			status = "okay";
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				port@0 {
+					reg = <0>;
+					csiphy1_ep: endpoint {
+						clock-lanes = <1>;
+						data-lanes = <0 2>;
+						remote-endpoint = <&ov5640_2_ep>;
+						/*
+						status = "disabled";
+						*/
+					};
+				};
+
+			};
+
+		};
+	};
+
+	usb2513 {
+		compatible = "smsc,usb3503";
+		reset-gpios = <&pm8916_gpios 3 GPIO_ACTIVE_LOW>;
+		initial-mode = <1>;
+	};
+
+
+
+	usb_id: usb-id {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&msmgpio 121 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb_id_default>;
+	};
+
+/*
+	gpio_keys {
+		compatible = "gpio-keys";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		autorepeat;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&msm_key_volp_n_default>;
+
+		button@0 {
+			label = "Volume Up";
+			linux,code = <KEY_VOLUMEUP>;
+			gpios = <&msmgpio 107 GPIO_ACTIVE_LOW>;
+		};
+	};
+*/
+
+};
+
+&wcd_codec {
+        status = "okay";
+        clocks = <&gcc GCC_CODEC_DIGCODEC_CLK>;
+        clock-names = "mclk";
+};
+
+&smd_rpm_regulators {
+	vdd_l1_l2_l3-supply = <&pm8916_s3>;
+	vdd_l5-supply = <&pm8916_s3>;
+	vdd_l4_l5_l6-supply = <&pm8916_s4>;
+	vdd_l7-supply = <&pm8916_s4>;
+
+	s1 {
+		regulator-min-microvolt = <375000>;
+		regulator-max-microvolt = <1562000>;
+	};
+
+	s3 {
+		regulator-min-microvolt = <375000>;
+		regulator-max-microvolt = <1562000>;
+	};
+
+	s4 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	l1 {
+		regulator-min-microvolt = <375000>;
+		regulator-max-microvolt = <1525000>;
+	};
+
+	l2 {
+		regulator-min-microvolt = <1200000>;
+		regulator-max-microvolt = <1200000>;
+	};
+
+	l3 {
+		regulator-min-microvolt = <375000>;
+		regulator-max-microvolt = <1525000>;
+	};
+
+	l4 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l5 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l6 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	l7 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l8 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l9 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l10 {
+		regulator-min-microvolt = <2800000>;
+		regulator-max-microvolt = <2800000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	l11 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+		regulator-allow-set-load;
+		regulator-system-load = <200000>;
+	};
+
+	l12 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l13 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l14 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	/**
+	 * 1.8v required on LS expansion
+	 * for mezzanine boards
+	 */
+	l15 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+		regulator-always-on;
+	};
+
+	l16 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+
+	l17 {
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	l18 {
+		regulator-min-microvolt = <1750000>;
+		regulator-max-microvolt = <3337000>;
+	};
+};
+
+
+
+&dsi0 {
+	status = "okay";
+};
+
+
+
+
+
+
+

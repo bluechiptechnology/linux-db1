@@ -1,0 +1,44 @@
+
+#include "apq8016-sbc.dts"
+
+&lvds {
+	clock-frequency = <33264000>;
+	hactive = <800>;
+	vactive = <480>;
+	hback-porch = <0>;
+	hfront-porch = <246>;
+	vback-porch = <0>;
+	vfront-porch = <35>;
+	hsync-len = <10>;
+	vsync-len = <10>;
+	hsync-active = <0>;
+	vsync-active = <0>;
+	de-active = <1>;
+	pixelclk-active = <0>;
+};
+
+
+&dsi_lvds_bridge {
+    /* MSB bits in 4th LVDS lane */
+    ti,lvds-format = <2>;
+
+	ti,width-mm = <152>;
+	ti,height-mm = <91>;
+};
+
+
+&dsi0_out {
+	remote-endpoint = <&sn65dsi83_in>;
+	data-lanes = <0 1 2 3>;
+};
+
+/* resistive touch screen */
+&tsc2046{
+	status = "okay";
+	calibrated_xmin = /bits/ 16 <129>;
+	calibrated_xmax = /bits/ 16 <4077>;
+	calibrated_ymin = /bits/ 16 <175>;
+	calibrated_ymax = /bits/ 16 <3658>;
+	swapx;
+};
+

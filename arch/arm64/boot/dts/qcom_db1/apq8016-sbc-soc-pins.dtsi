@@ -1,0 +1,118 @@
+// SPDX-License-Identifier: GPL-2.0
+
+#include <dt-bindings/gpio/gpio.h>
+
+&msmgpio {
+
+    gpio-line-names = "test0", "test1", "", "test3";
+
+	usb_id_default: usb-id-default {
+		pinmux {
+			function = "gpio";
+			pins = "gpio120";
+		};
+
+		pinconf {
+			pins = "gpio120";
+			drive-strength = <8>;
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
+	/* ethernet adapter on usb - enabled */
+	usb_eth_default: usb_eth_default {
+		pinmux {
+			function = "gpio";
+			pins = "gpio61";
+		};
+
+		pinconf {
+			pins = "gpio61";
+			drive-strength = <8>;
+			output-high;
+		};
+	};
+
+	/* ethernet adapter on usb - disabled */
+	usb_eth_off: usb_eth_off {
+		pinmux {
+			function = "gpio";
+			pins = "gpio61";
+		};
+
+		pinconf {
+			pins = "gpio61";
+			drive-strength = <8>;
+			output-low;
+		};
+	};
+
+
+	/* SPI2LVDS IRQ# */
+	sn65dsi83_int_active: sn65dsi83_int_active {
+		pinmux {
+			function = "gpio";
+			pins = "gpio62";
+		};
+		pinconf {
+			pins = "gpio62";
+			drive-strength = <8>;
+			input-enable;
+			bias-pull-up;
+		};
+	};
+	
+	sn65dsi83_int_suspend: sn65dsi83_int_suspend {
+		pinmux {
+			function = "gpio";
+			pins = "gpio62";
+		};
+		pinconf {
+			pins = "gpio62";
+			drive-strength = <2>;
+			input-enable;
+			bias-disable;
+		};
+	};
+
+	/* SPI2UART IRQ# */
+	xr20m1170_int_active: xr20m1170_int_active {
+		pinmux {
+			function = "gpio";
+			pins = "gpio25";
+		};
+		pinconf {
+			pins = "gpio25";
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
+	/* resistive touch screen IRQ# */
+	restouch_int_active: restouch_int_active {
+		pinmux {
+			function = "gpio";
+			pins = "gpio20";
+		};
+		pinconf {
+			pins = "gpio20";
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
+
+	msm_key_volp_n_default: msm_key_volp_n_default {
+		pinmux {
+			function = "gpio";
+			pins = "gpio107";
+		};
+		pinconf {
+			pins = "gpio107";
+			drive-strength = <8>;
+			input-enable;
+			bias-pull-up;
+		};
+	};
+};

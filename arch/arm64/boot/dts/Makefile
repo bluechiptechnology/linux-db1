@@ -16,6 +16,7 @@ dts-dirs += marvell
 dts-dirs += mediatek
 dts-dirs += nvidia
 dts-dirs += qcom
+dts-dirs += qcom_db1
 dts-dirs += realtek
 dts-dirs += renesas
 dts-dirs += rockchip
