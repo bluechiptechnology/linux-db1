@@ -1251,4 +1251,5 @@ config TOUCHSCREEN_FT5X06
         help
           If unsure, say N.
 
+source "drivers/input/touchscreen/ilitek_touch/Kconfig"
 endif

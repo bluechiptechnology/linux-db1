@@ -1,0 +1,14 @@
+#
+# Ilitek Touchscreen driver configuration
+#
+
+config TOUCHSCREEN_ILITEK
+        tristate "Ilitek based Touchscreen"
+		depends on I2C
+		select INPUT_POLLDEV
+		default n
+		help
+		  Say Y here if you have Ilitek based touch panel.
+		  If unsure, say N.
+
+
