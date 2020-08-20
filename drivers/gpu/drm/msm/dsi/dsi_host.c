@@ -214,7 +214,7 @@ static const struct msm_dsi_cfg_handler *dsi_get_config(
 		goto exit;
 	}
 
-	ahb_clk = clk_get(dev, "iface_clk");
+	ahb_clk = clk_get(dev, "iface");
 	if (IS_ERR(ahb_clk)) {
 		pr_err("%s: cannot get interface clock\n", __func__);
 		goto put_gdsc;
