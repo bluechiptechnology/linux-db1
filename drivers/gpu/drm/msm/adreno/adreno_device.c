@@ -358,6 +358,7 @@ static int adreno_suspend(struct device *dev)
 #endif
 
 static const struct dev_pm_ops adreno_pm_ops = {
+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume) /* https://patchwork.kernel.org/patch/10403985/ */
 	SET_RUNTIME_PM_OPS(adreno_suspend, adreno_resume, NULL)
 };
 
