@@ -1246,4 +1246,9 @@ config TOUCHSCREEN_ROHM_BU21023
 	  To compile this driver as a module, choose M here: the
 	  module will be called bu21023_ts.
 
+config TOUCHSCREEN_FT5X06
+        tristate "FocalTech FT5x06 I2C Touchscreen support"
+        help
+          If unsure, say N.
+
 endif
