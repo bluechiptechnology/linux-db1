@@ -788,6 +788,16 @@ static int q6v5_start(struct rproc *rproc)
 		goto halt_axi_ports;
 	}
 
+	/* Wait for rmtfs is ready. If hexagon firmware is loaded before
+	rmtfs is ready then its internal operation fails and is stalled 
+	until its watchdog requests a restart (after 40 seconds).
+	see: https://discuss.96boards.org/t/18-01-oe-gps-hexagon-not-working/4133/3
+	response from 'bamse' Mar'18
+	 */
+	dev_info(qproc->dev, "MBA booted, waiting for rmtfs...\n");
+
+	usleep_range(1000* 5000, 1000* 6000);
+
 	dev_info(qproc->dev, "MBA booted, loading mpss\n");
 
 	ret = q6v5_mpss_load(qproc);
@@ -954,7 +964,7 @@ static irqreturn_t q6v5_fatal_interrupt(int irq, void *dev)
 		dev_err(qproc->dev, "fatal error received: %s\n", msg);
 	else
 		dev_err(qproc->dev, "fatal error without message\n");
-
+	qproc->running = false;
 	rproc_report_crash(qproc->rproc, RPROC_FATAL_ERROR);
 
 	return IRQ_HANDLED;
