@@ -62,15 +62,26 @@
     status = "okay";
 };
 
-/* SPI test - only for debug  */
-/*
-&spidev1 {
-    status = "okay";
+/* camera support */
+&camera_front
+{
+	status = "okay";
+};
+
+&ov5640_ep
+{
+	status = "okay";
 };
 
 
-&spidev2 {
-    status = "okay";
+&camss
+{
+	status = "okay";
 };
-*/
+
+&csiphy0_ep
+{
+	status = "okay";
+};
+
 

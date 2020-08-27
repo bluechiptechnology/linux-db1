@@ -37,4 +37,25 @@
     status = "okay";
 };
 
+/* camera support */
+&camera_front
+{
+	status = "okay";
+};
+
+&ov5640_ep
+{
+	status = "okay";
+};
+
+
+&camss
+{
+	status = "okay";
+};
+
+&csiphy0_ep
+{
+	status = "okay";
+};
 
