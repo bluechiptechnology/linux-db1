@@ -533,6 +533,7 @@
         status = "okay";
         clocks = <&gcc GCC_CODEC_DIGCODEC_CLK>;
         clock-names = "mclk";
+        qcom,micbias-lvl = <2800>;
 };
 
 &smd_rpm_regulators {
