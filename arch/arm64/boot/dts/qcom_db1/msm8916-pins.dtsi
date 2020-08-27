@@ -653,37 +653,6 @@
 		};
 	};
 
-	/* secondary Mi2S */
-    /*
-	ext-sec-tlmm-lines {
-		ext_sec_tlmm_lines_act: tlmm_lines_on {
-			pinmux {
-				function = "sec_mi2s";
-				pins = "gpio112", "gpio117", "gpio118",
-				       "gpio119";
-			};
-			pinconf {
-				pins = "gpio112", "gpio117", "gpio118",
-					"gpio119";
-				drive-strength = <8>;
-				bias-pull-none;
-			};
-		};
-		ext_sec_tlmm_lines_sus: tlmm_lines_off {
-			pinmux {
-				function = "sec_mi2s";
-				pins = "gpio112", "gpio117", "gpio118",
-				       "gpio119";
-			};
-			pinconf {
-				pins = "gpio112", "gpio117", "gpio118",
-					"gpio119";
-				drive-strength = <2>;
-				bias-disable;
-			};
-		};
-	};
-	*/
 
 	cdc-dmic-lines {
 		cdc_dmic_lines_act: dmic_lines_on {
@@ -749,17 +718,16 @@
 	};
 
 	camera_front_default: camera_front_default {
-/*
 		pinmux_pwdn {
 			function = "gpio";
-			pins = "gpio33";
+			pins = "gpio28";
 		};
 		pinconf_pwdn {
-			pins = "gpio33";
+			pins = "gpio28";
 			drive-strength = <16>;
 			bias-disable;
 		};
-*/
+/*
 		pinmux_rst {
 			function = "gpio";
 			pins = "gpio28";
@@ -769,49 +737,17 @@
 			drive-strength = <16>;
 			bias-disable;
 		};
-
-/*
-		pinmux_mclk1 {
-			function = "cam_mclk1";
-			pins = "gpio27";
-		};
-		pinconf_mclk1 {
-			pins = "gpio27";
-			drive-strength = <16>;
-			bias-disable;
-		};
 */
-	};
-
-	camera_rear_default: camera_rear_default {
-		pinmux_pwdn {
-			function = "gpio";
-			pins = "gpio34";
-		};
-		pinconf_pwdn {
-			pins = "gpio34";
-			drive-strength = <16>;
-			bias-disable;
-		};
-
-		 pinmux_rst {
-			function = "gpio";
-			pins = "gpio35";
-		};
-		pinconf_rst {
-			pins = "gpio35";
-			drive-strength = <16>;
-			bias-disable;
-		};
-
 		pinmux_mclk0 {
 			function = "cam_mclk0";
 			pins = "gpio26";
 		};
+
 		pinconf_mclk0 {
 			pins = "gpio26";
 			drive-strength = <16>;
 			bias-disable;
 		};
 	};
+
 };

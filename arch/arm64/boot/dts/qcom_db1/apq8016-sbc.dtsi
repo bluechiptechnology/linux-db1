@@ -433,66 +433,64 @@
 
 			camera_front: camera_front@3c {
 				compatible = "ovti,ov5640";
-				reg = <0x3c>; /* 3c or 7C ? */
+				reg = <0x3c>;
 
 				/*
-				reset-gpios = <&msmgpio 33 GPIO_ACTIVE_LOW>;
-				*/
-				
+				reset-gpios = <&msmgpio 33 GPIO_ACTIVE_LOW>;		
 				powerdown-gpios = <&msmgpio 28 GPIO_ACTIVE_HIGH>;
-
+				*/
+				enable-gpios = <&msmgpio 28 GPIO_ACTIVE_HIGH>;
 				pinctrl-names = "default";
 				pinctrl-0 = <&camera_front_default>;
 
 				clocks = <&gcc GCC_CAMSS_MCLK0_CLK>;
 				clock-names = "xclk";
 				clock-frequency = <23880000>;
-
 				/*
+				vdddo-supply = <&camera_vdddo_1v8>;
+				vdda-supply = <&camera_vdda_2v8>;
+				vddd-supply = <&camera_vddd_1v5>;
+				*/
+
 				DOVDD-supply = <&camera_vdddo_1v8>;
 				AVDD-supply = <&camera_vdda_2v8>;
 				DVDD-supply = <&camera_vddd_1v5>;
-				*/
-				
 
+				/*
 				DOVDD-supply = <&camera_vdddo_1v8>;
 				AVDD-supply = <&pm8916_l10>;
 				DVDD-supply = <&camera_vddd_1v5>;
-
-				/*
-				status = "disabled";
 				*/
 				
+				status = "disabled";
+				
 				port {
-					ov5640_2_ep: endpoint {
+					ov5640_ep: endpoint {
 						clock-lanes = <1>;
 						data-lanes = <0 2>;
-						remote-endpoint = <&csiphy1_ep>;
+						remote-endpoint = <&csiphy0_ep>;
 					};
 				};
 			};
 		};
 
-		camss@1b00000 {
-			status = "okay";
+		camss: camss@1b00000 {
+			status = "disabled";
 			ports {
 				#address-cells = <1>;
 				#size-cells = <0>;
 
 				port@0 {
 					reg = <0>;
-					csiphy1_ep: endpoint {
+					csiphy0_ep: endpoint {
 						clock-lanes = <1>;
 						data-lanes = <0 2>;
-						remote-endpoint = <&ov5640_2_ep>;
-						/*
+						remote-endpoint = <&ov5640_ep>;
 						status = "disabled";
-						*/
 					};
 				};
 
 			};
-
 		};
 	};
 

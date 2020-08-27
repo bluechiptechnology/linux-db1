@@ -55,21 +55,28 @@
 
 
 /* camera support */
-
-&csiphy1_ep
-{
-	status = "okay";
-};
-
-&ov5640_2_ep
-{
-	status = "okay";
-};
-
 &camera_front
 {
 	status = "okay";
 };
+
+&ov5640_ep
+{
+	status = "okay";
+};
+
+
+&camss
+{
+	status = "okay";
+};
+
+&csiphy0_ep
+{
+	status = "okay";
+};
+
+
 
 
 &spi2uart {
