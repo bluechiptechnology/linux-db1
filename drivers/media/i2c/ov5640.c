@@ -1568,6 +1568,8 @@ static int ov5640_set_power(struct ov5640_dev *sensor, bool on)
 		if (ret)
 			goto power_off;
 
+		/* wait for the voltage to settle */
+		usleep_range(10000, 11000);
 		ret = ov5640_restore_mode(sensor);
 		if (ret)
 			goto power_off;
