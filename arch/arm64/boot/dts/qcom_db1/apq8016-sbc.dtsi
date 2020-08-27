@@ -259,6 +259,7 @@
 				spi-max-frequency = <1000000>;
 				pinctrl-names = "default";
 				pinctrl-0 = <&xr20m1170_int_active>;
+				nr-uart = <1>;
 			};
 		};
 
