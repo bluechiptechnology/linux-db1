@@ -796,7 +796,7 @@ static int q6v5_start(struct rproc *rproc)
 	 */
 	dev_info(qproc->dev, "MBA booted, waiting for rmtfs...\n");
 
-	usleep_range(1000* 5000, 1000* 6000);
+	usleep_range(1000* 8000, 1000* 9000);
 
 	dev_info(qproc->dev, "MBA booted, loading mpss\n");
 
