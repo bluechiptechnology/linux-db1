@@ -1,5 +1,6 @@
 
 #include "apq8016-sbc.dts"
+#include "db1_cb3.dtsi"
 
 /* Development DTS for testing various features */
 

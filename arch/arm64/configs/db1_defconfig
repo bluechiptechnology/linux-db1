@@ -1232,7 +1232,49 @@ CONFIG_NET_FLOW_LIMIT=y
 #
 # CONFIG_NET_PKTGEN is not set
 # CONFIG_HAMRADIO is not set
-# CONFIG_CAN is not set
+CONFIG_CAN=y
+CONFIG_CAN_RAW=y
+CONFIG_CAN_BCM=y
+CONFIG_CAN_GW=y
+
+#
+# CAN Device Drivers
+#
+CONFIG_CAN_VCAN=m
+# CONFIG_CAN_VXCAN is not set
+# CONFIG_CAN_SLCAN is not set
+CONFIG_CAN_DEV=y
+CONFIG_CAN_CALC_BITTIMING=y
+# CONFIG_CAN_LEDS is not set
+# CONFIG_CAN_GRCAN is not set
+# CONFIG_CAN_XILINXCAN is not set
+# CONFIG_CAN_C_CAN is not set
+# CONFIG_CAN_CC770 is not set
+# CONFIG_CAN_IFI_CANFD is not set
+# CONFIG_CAN_M_CAN is not set
+# CONFIG_CAN_PEAK_PCIEFD is not set
+# CONFIG_CAN_RCAR is not set
+# CONFIG_CAN_RCAR_CANFD is not set
+# CONFIG_CAN_SJA1000 is not set
+# CONFIG_CAN_SOFTING is not set
+
+#
+# CAN SPI interfaces
+#
+# CONFIG_CAN_HI311X is not set
+CONFIG_CAN_MCP251X=y
+
+#
+# CAN USB interfaces
+#
+# CONFIG_CAN_EMS_USB is not set
+# CONFIG_CAN_ESD_USB2 is not set
+# CONFIG_CAN_GS_USB is not set
+# CONFIG_CAN_KVASER_USB is not set
+# CONFIG_CAN_PEAK_USB is not set
+# CONFIG_CAN_8DEV_USB is not set
+# CONFIG_CAN_MCBA_USB is not set
+# CONFIG_CAN_DEBUG_DEVICES is not set
 CONFIG_BT=m
 CONFIG_BT_BREDR=y
 CONFIG_BT_RFCOMM=m
@@ -5422,9 +5464,13 @@ CONFIG_EXTCON_USB_GPIO=y
 # CONFIG_EXTCON_USBC_CROS_EC is not set
 # CONFIG_MEMORY is not set
 CONFIG_IIO=y
-# CONFIG_IIO_BUFFER is not set
+CONFIG_IIO_BUFFER=y
+# CONFIG_IIO_BUFFER_CB is not set
+CONFIG_IIO_KFIFO_BUF=y
+CONFIG_IIO_TRIGGERED_BUFFER=y
 # CONFIG_IIO_CONFIGFS is not set
-# CONFIG_IIO_TRIGGER is not set
+CONFIG_IIO_TRIGGER=y
+CONFIG_IIO_CONSUMERS_PER_TRIGGER=2
 # CONFIG_IIO_SW_DEVICE is not set
 # CONFIG_IIO_SW_TRIGGER is not set
 
@@ -5448,7 +5494,7 @@ CONFIG_IIO=y
 # CONFIG_MMA7455_I2C is not set
 # CONFIG_MMA7455_SPI is not set
 # CONFIG_MMA7660 is not set
-# CONFIG_MMA8452 is not set
+CONFIG_MMA8452=y
 # CONFIG_MMA9551 is not set
 # CONFIG_MMA9553 is not set
 # CONFIG_MXC4005 is not set
@@ -5690,6 +5736,12 @@ CONFIG_ROCKCHIP_SARADC=m
 #
 # Inclinometer sensors
 #
+
+#
+# Triggers - standalone
+#
+# CONFIG_IIO_INTERRUPT_TRIGGER is not set
+# CONFIG_IIO_SYSFS_TRIGGER is not set
 
 #
 # Digital potentiometers

@@ -1,0 +1,170 @@
+
+
+/* CB3 expansion board on 50w connector */
+
+/* interrupt pins for CAN ICs */
+&msmgpio {
+
+	/* CAN1 INT voltage shifter */
+	can1_int_vs: can1_int_vs {
+		pinmux {
+			function = "gpio";
+			pins = "gpio51";
+		};
+		pinconf {
+			pins = "gpio51";
+			drive-strength = <8>;
+			output-low; /* B->A: low = input */
+		};
+	};
+
+	/* CAN1 INT */
+	can1_int: can1_int {
+		pinmux {
+			function = "gpio";
+			pins = "gpio109";
+		};
+		pinconf {
+			pins = "gpio109";
+			drive-strength = <8>;
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
+	/* CAN1 Chip Select voltage shifter */
+	can1_cs_vs: can1_cs_vs {
+		pinmux {
+			function = "gpio";
+			pins = "gpio52";
+		};
+		pinconf {
+			pins = "gpio52";
+			drive-strength = <8>;
+			output-high; /* A->B: high = output */
+		};
+	};
+
+
+	/* CAN1 Chip Select CS# */
+	can1_cs: can1_cs {
+		pinmux {
+			function = "gpio";
+			pins = "gpio110";
+		};
+		pinconf {
+			pins = "gpio110";
+			drive-strength = <8>;
+			output-high; /* H: unselected, L: selected */ 
+		};
+	};
+
+
+	/* CAN2 INT voltage shifter */
+	can2_int_vs: can2_int_vs {
+		pinmux {
+			function = "gpio";
+			pins = "gpio53";
+		};
+		pinconf {
+			pins = "gpio53";
+			drive-strength = <8>;
+			output-low; /* B->A: low = input */
+		};
+	};
+
+	/* CAN2 INT */
+	can2_int: can2_int {
+		pinmux {
+			function = "gpio";
+			pins = "gpio111";
+		};
+		pinconf {
+			pins = "gpio111";
+			drive-strength = <8>;
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
+	/* CAN2 Chip Select voltage shifter */
+	can2_cs_vs: can2_cs_vs {
+		pinmux {
+			function = "gpio";
+			pins = "gpio54";
+		};
+		pinconf {
+			pins = "gpio54";
+			drive-strength = <8>;
+			output-high; /* A->B: high = output */
+		};
+	};
+
+	/* CAN2 Chip Select CS# */
+	can2_cs: can2_cs {
+		pinmux {
+			function = "gpio";
+			pins = "gpio112";
+		};
+		pinconf {
+			pins = "gpio112";
+			drive-strength = <8>;
+			output-high; /* H: unselected, L: selected */ 
+		};
+	};
+
+};
+
+&spi1 {
+	num-cs = <3>;
+	cs-gpios =  <&msmgpio 10 GPIO_ACTIVE_LOW>,  /* resistive touch screen */
+				<&msmgpio 110 GPIO_ACTIVE_LOW>, /* CAN IC1 */
+				<&msmgpio 112 GPIO_ACTIVE_LOW>; /* CAN IC2 */
+
+	/*  It looks like the hardware can lock to certain frequencies only,
+		and choses a higher frequency than the one that is specified here.
+		The maximum the CAN chip supports is 10MHz.
+	 */
+	spi-max-frequency = <9600000>;
+
+	/* set up interrupt pins and the direction of level shifters */
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi3_default &can1_cs_vs &can1_cs &can2_cs_vs &can2_cs &can1_int_vs &can2_int_vs &can1_int &can2_int>;
+
+	/* CB3 board on 50w connector: CAN IC1 */
+	can1: can@1 {
+		compatible = "microchip,mcp2515";
+		reg = <1>;
+		clocks = <&can_clk>;
+		interrupt-parent = <&msmgpio>;
+		interrupts = <109 GPIO_ACTIVE_LOW>;
+		spi-max-frequency = <9600000>;
+		status = "okay";
+	};
+
+	/* CB3 board on 50w connector: CAN IC3 */
+	can2: can@2 {
+		compatible = "microchip,mcp2515";
+		reg = <2>;
+		clocks = <&can_clk>;
+		interrupt-parent = <&msmgpio>;
+		interrupts = <111 GPIO_ACTIVE_LOW>;
+		spi-max-frequency = <9600000>;
+		status = "okay";
+	};
+				
+};
+
+/* MMA8451Q Accelerometer on I2C bus 1*/
+&blsp_i2c6 {
+
+	/* CB3 board on 50w connector: U1 */
+	accel: mma8451q@1c {
+		compatible = "fsl,mma8451";
+		reg = <0x1c>;
+		status = "okay";
+	};
+};
+
+
+

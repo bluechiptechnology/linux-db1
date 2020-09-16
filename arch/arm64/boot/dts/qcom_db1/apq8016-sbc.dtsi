@@ -202,13 +202,20 @@
 			status = "okay";
 		};
 
-		spi@78b7000 {
+		/* CAN - fixed crystal X1 */
+		can_clk: can_clk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <16000000>;
+			clock-output-names = "can_clk16m";
+		};
+
+		spi1: spi@78b7000 {
 		/* On High speed expansion */
 			label = "HS-SPI1";
 			status = "okay";
-			num-cs = <2>;
-			cs-gpios = <&msmgpio 10 GPIO_ACTIVE_LOW>,
-                       <&msmgpio 69 GPIO_ACTIVE_LOW>;
+			num-cs = <1>;
+			cs-gpios = <&msmgpio 10 GPIO_ACTIVE_LOW>;
 			spi-max-frequency = <200000>;
 
 			/* resistive touch screen */
@@ -240,7 +247,7 @@
 			clock-accuracy = <100>;
 		};
 
-		spi@78b9000 {
+		spi0: spi@78b9000 {
 		/* On Low speed expansion */
 			label = "LS-SPI0";
 			status = "okay";
