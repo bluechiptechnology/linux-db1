@@ -127,6 +127,8 @@
             pcap: ft5x06@38 {
                 compatible = "focaltech,ft5x06";
                 reg = <0x38>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&captouch_int_active>;
                 interrupt-parent = <&msmgpio>;
                 interrupts = <21 0>;
                 reset-gpio = <&msmgpio 60 1>;
@@ -137,6 +139,8 @@
             pcap2: ilitek@41 {
                 compatible = "tchip,ilitek";
                 reg = <0x41>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&captouch_int_active>;
                 interrupt-parent = <&msmgpio>;
                 interrupts = <21 0>;
                 touch-gpio = <&msmgpio 21 0>;
@@ -148,6 +152,8 @@
             pcap3: eeti@2a {
                 compatible = "eeti,egalax_i2c";
                 reg = <0x2A>;
+                pinctrl-names = "default";
+                pinctrl-0 = <&captouch_int_active>;
                 interrupt-parent = <&msmgpio>;
                 interrupts = <21 0>;
                 int-gpios = <&msmgpio 21 0>;

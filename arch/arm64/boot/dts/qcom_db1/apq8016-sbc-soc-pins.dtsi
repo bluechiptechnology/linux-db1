@@ -102,6 +102,19 @@
 		};
 	};
 
+	/* capacitive touch screen IRQ# */
+	captouch_int_active: captouch_int_active {
+		pinmux {
+			function = "gpio";
+			pins = "gpio21";
+		};
+		pinconf {
+			pins = "gpio21";
+			input-enable;
+			bias-pull-up;
+		};
+	};
+
 
 	msm_key_volp_n_default: msm_key_volp_n_default {
 		pinmux {
