@@ -35,11 +35,10 @@
 /* resistive touch screen */
 &tsc2046{
 	status = "okay";
-	calibrated_xmin = /bits/ 16 <129>;
-	calibrated_xmax = /bits/ 16 <4077>;
-	calibrated_ymin = /bits/ 16 <175>;
-	calibrated_ymax = /bits/ 16 <3658>;
-	swapx;
+	ti,x-min = /bits/ 16 <112>;
+	ti,x-max = /bits/ 16 <3970>;
+	ti,y-max = /bits/ 16 <170>;
+	ti,y-min = /bits/ 16 <3856>;
 };
 
 /* camera support */

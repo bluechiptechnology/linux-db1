@@ -238,8 +238,12 @@
 				ti,x-max = /bits/ 16 <0>;
 				ti,y-min = /bits/ 16 <0>;
 				ti,y-max = /bits/ 16 <0>;
-				ti,pressure-max = /bits/ 16 <0>;
+				ti,pressure-min = /bits/ 16 <0>;
+				ti,pressure-max = /bits/ 16 <700>;
 				ti,x-plate-ohms = /bits/ 16 <400>;
+				ti,debounce-rep = /bits/ 16 <1>;
+				ti,debounce-tol = /bits/ 16 <8>;
+				ti,debounce-max = /bits/ 16 <8>;
 				wakeup-source;
 			};
 
