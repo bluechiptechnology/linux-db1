@@ -665,6 +665,13 @@ static int pm8916_wcd_analog_enable_spk_pa(struct snd_soc_dapm_widget *w,
 				    SPKR_PWRSTG_CTL_HBRDGE_EN_MASK |
 				    SPKR_PWRSTG_CTL_CLAMP_EN_MASK, 0);
 
+		//Down event - disable speaker and the boost
+		snd_soc_update_bits(codec, w->reg,
+				    SPKR_DRV_CLASSD_PA_EN_MASK, 0);
+		snd_soc_update_bits(codec, w->reg,
+				    SPKR_DRV_BOOST_SET, 0);
+
+
 		snd_soc_update_bits(codec, CDC_A_SPKR_DAC_CTL,
 				    SPKR_DAC_CTL_DAC_RESET_MASK,
 				    SPKR_DAC_CTL_DAC_RESET_NORMAL);
@@ -825,6 +832,39 @@ static const struct snd_soc_dapm_route pm8916_wcd_analog_audio_map[] = {
 	{"MIC BIAS External2", NULL, "vdd-micbias"},
 };
 
+static int msm8x16_wcd_hph_pa_event(struct snd_soc_dapm_widget *w,
+					    struct snd_kcontrol *kcontrol,
+					    int event)
+{
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	switch (event) {
+		case SND_SOC_DAPM_PRE_PMU:
+			snd_soc_component_update_bits(component, w->reg, 0x2, 0x2);
+			break;
+		case SND_SOC_DAPM_POST_PMU:
+		case SND_SOC_DAPM_POST_PMD:
+			usleep_range(10000, 10100);
+			break;
+	}
+	return 0;
+}
+
+static int msm8x16_wcd_hph_dac_event(struct snd_soc_dapm_widget *w,
+					    struct snd_kcontrol *kcontrol,
+					    int event)
+{
+	struct snd_soc_component *component = snd_soc_dapm_to_component(w->dapm);
+	switch (event) {
+		case SND_SOC_DAPM_PRE_PMU:
+			snd_soc_component_update_bits(component, w->reg, 0x2, 0x2);
+			break;
+		case SND_SOC_DAPM_POST_PMU:
+			snd_soc_component_update_bits(component, w->reg, 0x2, 0);
+			break;
+	}
+	return 0;
+}
+
 static const struct snd_soc_dapm_widget pm8916_wcd_analog_dapm_widgets[] = {
 
 	SND_SOC_DAPM_AIF_IN("PDM_RX1", NULL, 0, SND_SOC_NOPM, 0, 0),
@@ -840,14 +880,27 @@ static const struct snd_soc_dapm_widget pm8916_wcd_analog_dapm_widgets[] = {
 	/* RX stuff */
 	SND_SOC_DAPM_SUPPLY("INT_LDO_H", SND_SOC_NOPM, 1, 0, NULL, 0),
 
-	SND_SOC_DAPM_PGA("HPHL PA", CDC_A_RX_HPH_CNP_EN, 5, 0, NULL, 0),
+// See: https://people.linaro.org/~srinivas.kandagatla/0001-ASoC-msm8916-wcd-analog-add-delay-before-PA-enable-d.patch
+	SND_SOC_DAPM_PGA_E("HPHL PA", CDC_A_RX_HPH_CNP_EN, 5, 0, NULL, 0,
+				msm8x16_wcd_hph_pa_event, SND_SOC_DAPM_PRE_PMU |
+				SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD | 
+				SND_SOC_DAPM_POST_PMD),
+	
 	SND_SOC_DAPM_MUX("HPHL", SND_SOC_NOPM, 0, 0, &hphl_mux),
-	SND_SOC_DAPM_MIXER("HPHL DAC", CDC_A_RX_HPH_L_PA_DAC_CTL, 3, 0, NULL,
-			   0),
-	SND_SOC_DAPM_PGA("HPHR PA", CDC_A_RX_HPH_CNP_EN, 4, 0, NULL, 0),
+	SND_SOC_DAPM_MIXER_E("HPHL DAC", CDC_A_RX_HPH_L_PA_DAC_CTL, 3, 0, NULL,
+			   0, msm8x16_wcd_hph_dac_event, SND_SOC_DAPM_PRE_PMU |
+			   SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_POST_PMD),
+
+	SND_SOC_DAPM_PGA_E("HPHR PA", CDC_A_RX_HPH_CNP_EN, 4, 0, NULL, 0,
+				msm8x16_wcd_hph_pa_event, SND_SOC_DAPM_PRE_PMU |
+				SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_PRE_PMD | 
+				SND_SOC_DAPM_POST_PMD),
 	SND_SOC_DAPM_MUX("HPHR", SND_SOC_NOPM, 0, 0, &hphr_mux),
-	SND_SOC_DAPM_MIXER("HPHR DAC", CDC_A_RX_HPH_R_PA_DAC_CTL, 3, 0, NULL,
-			   0),
+
+	SND_SOC_DAPM_MIXER_E("HPHR DAC", CDC_A_RX_HPH_R_PA_DAC_CTL, 3, 0, NULL,
+			   0, msm8x16_wcd_hph_dac_event, SND_SOC_DAPM_PRE_PMU |
+			   SND_SOC_DAPM_POST_PMU | SND_SOC_DAPM_POST_PMD),
+
 	SND_SOC_DAPM_MIXER("SPK DAC", SND_SOC_NOPM, 0, 0,
 			   spkr_switch, ARRAY_SIZE(spkr_switch)),
 
