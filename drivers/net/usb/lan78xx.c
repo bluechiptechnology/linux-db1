@@ -1638,17 +1638,36 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
 {
 	u32 addr_lo, addr_hi;
 	int ret;
-	u8 addr[6];
+	u8 addr[6] = {0};
+	struct device* parentdev = dev->udev->dev.parent->parent;
+	
+	/* give priority to mac address set in DT */
+	if (parentdev) {
+		struct device_node * of_node = of_find_node_with_property(parentdev->of_node, "usb,0424,78xx");
+		if (!of_node) {
+			netdev_warn(dev->net, "can not find DT entry: %s\n", parentdev->of_node->full_name);			
+		} else {
+			const unsigned char *macaddr = of_get_mac_address(of_node);
+			if (macaddr) {
+				ether_addr_copy(addr, macaddr);
+				if (is_valid_ether_addr(addr)) {
+					netdev_info(dev->net, "using mac-address from DT\n");
+				}
+			}			
+		}
+	}
 
-	ret = lan78xx_read_reg(dev, RX_ADDRL, &addr_lo);
-	ret = lan78xx_read_reg(dev, RX_ADDRH, &addr_hi);
+	if (!is_valid_ether_addr(addr)) {
+		ret = lan78xx_read_reg(dev, RX_ADDRL, &addr_lo);
+		ret = lan78xx_read_reg(dev, RX_ADDRH, &addr_hi);
 
-	addr[0] = addr_lo & 0xFF;
-	addr[1] = (addr_lo >> 8) & 0xFF;
-	addr[2] = (addr_lo >> 16) & 0xFF;
-	addr[3] = (addr_lo >> 24) & 0xFF;
-	addr[4] = addr_hi & 0xFF;
-	addr[5] = (addr_hi >> 8) & 0xFF;
+		addr[0] = addr_lo & 0xFF;
+		addr[1] = (addr_lo >> 8) & 0xFF;
+		addr[2] = (addr_lo >> 16) & 0xFF;
+		addr[3] = (addr_lo >> 24) & 0xFF;
+		addr[4] = addr_hi & 0xFF;
+		addr[5] = (addr_hi >> 8) & 0xFF;
+	}
 
 	if (!is_valid_ether_addr(addr)) {
 		if (!eth_platform_get_mac_address(&dev->udev->dev, addr)) {
