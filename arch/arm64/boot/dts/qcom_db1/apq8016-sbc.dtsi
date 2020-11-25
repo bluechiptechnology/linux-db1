@@ -319,6 +319,17 @@
 					extcon = <&usb_id>;
 				};
 			};
+
+			usb-device-list {
+				// onboard USB ethernet interface
+				ethernet {
+					usb,0424,78xx = <0>; //a cue for bootloader and kernel
+					// If local-mac-address is not found by bootloader then it will inject
+					// the factory mac address.
+					// local-mac-address = [00 c0 46 aa bb cc];
+				};
+			};
+
 		};
 
 		mdss@1a00000 {
