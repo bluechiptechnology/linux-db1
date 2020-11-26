@@ -1640,6 +1640,7 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
 	int ret;
 	u8 addr[6] = {0};
 	struct device* parentdev = dev->udev->dev.parent->parent;
+	bool store_addr_regs = false;
 	
 	/* give priority to mac address set in DT */
 	if (parentdev) {
@@ -1652,12 +1653,14 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
 				ether_addr_copy(addr, macaddr);
 				if (is_valid_ether_addr(addr)) {
 					netdev_info(dev->net, "using mac-address from DT\n");
+					store_addr_regs = true;
 				}
 			}			
 		}
 	}
 
 	if (!is_valid_ether_addr(addr)) {
+		/* the address is read from the IC register itself */
 		ret = lan78xx_read_reg(dev, RX_ADDRL, &addr_lo);
 		ret = lan78xx_read_reg(dev, RX_ADDRH, &addr_hi);
 
@@ -1688,7 +1691,10 @@ static void lan78xx_init_mac_address(struct lan78xx_net *dev)
 			netif_dbg(dev, ifup, dev->net,
 				  "MAC address set to random addr");
 		}
-
+		store_addr_regs = true;
+	}
+	
+	if (store_addr_regs) {
 		addr_lo = addr[0] | (addr[1] << 8) |
 			  (addr[2] << 16) | (addr[3] << 24);
 		addr_hi = addr[4] | (addr[5] << 8);
