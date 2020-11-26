@@ -153,12 +153,30 @@ static int sn65dsi83_brg_start_stream(struct sn65dsi83_brg *brg)
 {
     int regval;
     struct i2c_client *client = I2C_CLIENT(brg);
+	int TimeoutCounter = 0;
 
     dev_dbg(&client->dev,"%s\n",__func__);
     /* Set the PLL_EN bit (CSR 0x0D.0) */
     SN65DSI83_WRITE(SN65DSI83_PLL_EN, 0x1);
     /* Wait for the PLL_LOCK bit to be set (CSR 0x0A.7) */
-    msleep(200);
+	regval = SN65DSI83_READ(SN65DSI83_CORE_PLL);
+	while (TimeoutCounter < 200)
+	{
+		if (regval & 0x80)
+		{
+			msleep(3);
+			break;
+		}
+
+		TimeoutCounter++;
+		msleep(1);
+		regval = SN65DSI83_READ(SN65DSI83_CORE_PLL);
+	}
+
+	if (TimeoutCounter >= 200)
+	{
+		dev_err(&client->dev, "LVDS PLL didn't lock");
+	}
 
     /* Perform SW reset to apply changes */
     SN65DSI83_WRITE(SN65DSI83_SOFT_RESET, 0x01);

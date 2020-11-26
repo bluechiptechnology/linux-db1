@@ -1,7 +1,6 @@
 /*
  * Licensed under the GPL-2.
  */
-
 #include <linux/device.h>
 #include <linux/gpio/consumer.h>
 #include <linux/module.h>
@@ -11,6 +10,7 @@
 #include <linux/slab.h>
 #include <linux/clk.h>
 #include <linux/backlight.h>
+#include <linux/sched.h>
 
 #include <drm/drmP.h>
 #include <drm/drm_atomic.h>
@@ -39,6 +39,7 @@ struct sn65dsi83 {
     struct mipi_dsi_device *dsi;
     struct sn65dsi83_brg *brg;
     struct backlight_device *backlight;
+	unsigned long last_disable_time;
 };
 
 static int sn65dsi83_attach_dsi(struct sn65dsi83 *sn65dsi83);
@@ -148,10 +149,27 @@ static struct sn65dsi83 *bridge_to_sn65dsi83(struct drm_bridge *bridge)
 
 static void sn65dsi83_bridge_enable(struct drm_bridge *bridge)
 {
+	unsigned long current_time;
+	uint64_t timedifference;
     struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
     dev_dbg(DRM_DEVICE(bridge),"%s\n",__func__);
+
+	current_time = jiffies;
+	timedifference = (current_time - sn65dsi83->last_disable_time);
+	timedifference  = timedifference * 1000 / HZ;
+
+	//Ensure LCD off to on time is greater than 400ms. Required to meet ZP097X02 timing
+	if (timedifference < 410)
+	{
+		timedifference = 410 - timedifference;
+		msleep(timedifference);
+	}
+
     sn65dsi83->brg->funcs->setup(sn65dsi83->brg);
     sn65dsi83->brg->funcs->start_stream(sn65dsi83->brg);
+
+    //Delay before enabling backlight to prevent garbage being seen
+    msleep(200);
 
     if (sn65dsi83->backlight) {
         sn65dsi83->backlight->props.power = FB_BLANK_UNBLANK;
@@ -165,14 +183,17 @@ static void sn65dsi83_bridge_disable(struct drm_bridge *bridge)
 {
     struct sn65dsi83 *sn65dsi83 = bridge_to_sn65dsi83(bridge);
     dev_dbg(DRM_DEVICE(bridge),"%s\n",__func__);
+
+	if (sn65dsi83->backlight) {
+		sn65dsi83->backlight->props.power = FB_BLANK_POWERDOWN;
+		sn65dsi83->backlight->props.state |= BL_CORE_FBBLANK;
+		backlight_update_status(sn65dsi83->backlight);
+	}
+
     sn65dsi83->brg->funcs->stop_stream(sn65dsi83->brg);
     sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
 
-    if (sn65dsi83->backlight) {
-        sn65dsi83->backlight->props.power = FB_BLANK_POWERDOWN;
-        sn65dsi83->backlight->props.state |= BL_CORE_FBBLANK;
-		backlight_update_status(sn65dsi83->backlight);
-    }
+	sn65dsi83->last_disable_time = jiffies;
 }
 
 static void sn65dsi83_bridge_mode_set(struct drm_bridge *bridge,
