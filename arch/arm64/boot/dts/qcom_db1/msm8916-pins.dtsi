@@ -141,7 +141,7 @@
 		};
 		pinmux_cs {
 			function = "gpio";
-			pins = "gpio10", "gpio69";
+			pins = "gpio10";
 		};
 		pinconf {
 			pins = "gpio8", "gpio9", "gpio11";
@@ -149,7 +149,7 @@
 			bias-disable;
 		};
 		pinconf_cs {
-			pins = "gpio10", "gpio69";
+			pins = "gpio10";
 			drive-strength = <16>;
 			bias-disable;
 			output-high;
