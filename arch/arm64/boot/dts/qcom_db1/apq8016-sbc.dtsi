@@ -464,11 +464,8 @@
 				compatible = "ovti,ov5640";
 				reg = <0x3c>;
 
-				/*
-				reset-gpios = <&msmgpio 33 GPIO_ACTIVE_LOW>;		
-				powerdown-gpios = <&msmgpio 28 GPIO_ACTIVE_HIGH>;
-				*/
-				enable-gpios = <&msmgpio 28 GPIO_ACTIVE_HIGH>;
+				reset-gpios = <&msmgpio 35 GPIO_ACTIVE_LOW>;		
+				powerdown-gpios = <&msmgpio 34 GPIO_ACTIVE_HIGH>;
 				pinctrl-names = "default";
 				pinctrl-0 = <&camera_front_default>;
 

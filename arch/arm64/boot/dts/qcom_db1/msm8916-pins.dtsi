@@ -720,24 +720,24 @@
 	camera_front_default: camera_front_default {
 		pinmux_pwdn {
 			function = "gpio";
-			pins = "gpio28";
+			pins = "gpio34";
 		};
 		pinconf_pwdn {
-			pins = "gpio28";
+			pins = "gpio34";
 			drive-strength = <16>;
 			bias-disable;
 		};
-/*
+
 		pinmux_rst {
 			function = "gpio";
-			pins = "gpio28";
+			pins = "gpio35";
 		};
 		pinconf_rst {
-			pins = "gpio28";
+			pins = "gpio35";
 			drive-strength = <16>;
 			bias-disable;
 		};
-*/
+
 		pinmux_mclk0 {
 			function = "cam_mclk0";
 			pins = "gpio26";
