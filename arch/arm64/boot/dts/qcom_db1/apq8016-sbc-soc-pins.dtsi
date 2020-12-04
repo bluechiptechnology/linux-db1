@@ -77,7 +77,7 @@
 	};
 
 	/* SPI2UART IRQ# */
-	xr20m1170_int_active: xr20m1170_int_active {
+	spi2uart_int_active: spi2uart_int_active {
 		pinmux {
 			function = "gpio";
 			pins = "gpio25";

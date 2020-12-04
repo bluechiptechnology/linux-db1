@@ -267,17 +267,17 @@
 			cs-gpios = <&msmgpio 18 GPIO_ACTIVE_LOW>;
 
 			spi2uart: spi2uart@0 {
-				status = "disabled";
-				compatible = "exar,xrm117x";
-				reg = <0>; /* CS #0 */
+				status = "okay";
+				compatible = "nxp,sc16is741";
+				reg = <0>; // CS #0
 				clocks = <&spi2uart_clk>;
 				interrupt-parent = <&msmgpio>;
-				interrupts = <25 0>; /* IRQ_TYPE_EDGE_FALLING */
+				interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
 				spi-max-frequency = <1000000>;
 				pinctrl-names = "default";
-				pinctrl-0 = <&xr20m1170_int_active>;
-				nr-uart = <1>;
+				pinctrl-0 = <&spi2uart_int_active>;
 			};
+
 		};
 
 		sdhci@07824000 {
