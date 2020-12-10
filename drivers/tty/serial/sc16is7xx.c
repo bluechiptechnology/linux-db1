@@ -30,6 +30,8 @@
 #include <linux/spi/spi.h>
 #include <linux/uaccess.h>
 #include <uapi/linux/sched/types.h>
+#include <linux/gpio.h>
+#include <linux/of_gpio.h>
 
 #define SC16IS7XX_NAME			"sc16is7xx"
 #define SC16IS7XX_MAX_DEVS		8
@@ -320,6 +322,8 @@ struct sc16is7xx_one {
 	struct kthread_work		tx_work;
 	struct kthread_work		reg_work;
 	struct sc16is7xx_one_config	config;
+	
+	int rs422rxen_gpio; /* GPIO to control rs422/rs485 transceiver's RX-Enable */
 };
 
 struct sc16is7xx_port {
@@ -687,6 +691,11 @@ static bool sc16is7xx_port_irq(struct sc16is7xx_port *s, int portno)
 		case SC16IS7XX_IIR_THRI_SRC:
 			sc16is7xx_handle_tx(port);
 			break;
+#if 1
+		case 0:
+			/* ignore interrupts 0 */
+			break;
+#endif
 		default:
 			dev_err_ratelimited(port->dev,
 					    "ttySC%i: Unexpected interrupt: %x",
@@ -959,8 +968,16 @@ static int sc16is7xx_config_rs485(struct uart_port *port,
 		 * However, it's sometimes useful to delay TX even without RTS
 		 * control therefore we try to handle .delay_rts_before_send.
 		 */
-		if (rs485->delay_rts_after_send)
+		if (rs485->delay_rts_after_send) {
+			dev_err(port->dev, "delay_rts_after_send is not supported");
 			return -EINVAL;
+		}
+
+		if (gpio_is_valid(one->rs422rxen_gpio)) {
+			dev_info(port->dev, "SER_RS485_RX_DURING_TX: setting RXEN gpio to %i\n",
+				(rs485->flags & SER_RS485_RX_DURING_TX) ? 1 : 0);
+			gpio_set_value(one->rs422rxen_gpio,  (rs485->flags & SER_RS485_RX_DURING_TX) ? 1 : 0);			
+		}
 	}
 
 	port->rs485 = *rs485;
@@ -1238,6 +1255,28 @@ static int sc16is7xx_probe(struct device *dev,
 			ret = -ENOMEM;
 			goto out_ports;
 		}
+		{
+			char of_gpio_name[11] = { 'r', 's', '4', '2', '2', 'e', 'n', 'r' , 'x', '0', 0};
+
+			of_gpio_name[9] = (char) ('0' + i);
+			#ifdef CONFIG_OF
+			s->p[i].rs422rxen_gpio = of_get_named_gpio(dev->of_node, (const char*) of_gpio_name, 0);
+			#else
+			s->p[i].rs422rxen_gpio = 0;
+			#endif
+
+			if (gpio_is_valid(s->p[i].rs422rxen_gpio)) {
+				int result = gpio_request(s->p[i].rs422rxen_gpio, "sc16-rs422enrx");
+				if (result < 0)
+				{
+					dev_err(dev, "gpio_request rs422enrx failed ret=%d\n", result);
+					s->p[i].rs422rxen_gpio = 0;
+				}
+				/* use pinctrl to set the gpio parameters */
+			} else {
+				dev_warn(dev, "gpio %s is undefined or invalid\n", of_gpio_name);
+			}
+		}
 
 		/* Disable all interrupts */
 		sc16is7xx_port_write(&s->p[i].port, SC16IS7XX_IER_REG, 0);
@@ -1311,6 +1350,11 @@ static int sc16is7xx_remove(struct device *dev)
 		uart_remove_one_port(&sc16is7xx_uart, &s->p[i].port);
 		clear_bit(s->p[i].port.line, &sc16is7xx_lines);
 		sc16is7xx_power(&s->p[i].port, 0);
+		
+		if (gpio_is_valid(s->p[i].rs422rxen_gpio)) {
+			gpio_free(s->p[i].rs422rxen_gpio);
+			s->p[i].rs422rxen_gpio = 0;
+		}
 	}
 
 	kthread_flush_worker(&s->kworker);
