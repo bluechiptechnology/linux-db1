@@ -88,6 +88,20 @@
 			bias-pull-up;
 		};
 	};
+	
+	/* SPI2UART RX enable in 4 wire rs422 mode */
+	spi2uart_rs422_enrx_active: spi2uart_rs422_enrx_active {
+		pinmux {
+			function = "gpio";
+			pins = "gpio73";
+		};
+		pinconf {
+			pins = "gpio73";
+			drive-strength = <8>;
+			output-high; //RX is enabled by default
+		};
+	};
+	
 
 	/* resistive touch screen IRQ# */
 	restouch_int_active: restouch_int_active {
