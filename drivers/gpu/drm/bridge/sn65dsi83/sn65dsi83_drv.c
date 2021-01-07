@@ -158,10 +158,10 @@ static void sn65dsi83_bridge_enable(struct drm_bridge *bridge)
 	timedifference = (current_time - sn65dsi83->last_disable_time);
 	timedifference  = timedifference * 1000 / HZ;
 
-	//Ensure LCD off to on time is greater than 400ms. Required to meet ZP097X02 timing
-	if (timedifference < 410)
+	//Ensure LCD off to on time is greater than 1000ms. Required to meet 7" LCD timing
+	if (timedifference < 1010)
 	{
-		timedifference = 410 - timedifference;
+		timedifference = 1010 - timedifference;
 		msleep(timedifference);
 	}
 
@@ -343,7 +343,7 @@ static int sn65dsi83_probe(struct i2c_client *i2c,
         return -ENODEV;
     }
     sn65dsi83->brg->funcs->power_off(sn65dsi83->brg);
-
+	sn65dsi83->last_disable_time = jiffies;
 
     sn65dsi83->bridge.funcs = &sn65dsi83_bridge_funcs;
     sn65dsi83->bridge.of_node = dev->of_node;

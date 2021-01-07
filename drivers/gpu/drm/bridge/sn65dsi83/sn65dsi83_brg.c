@@ -99,8 +99,9 @@ static int sn65dsi83_brg_power_on(struct sn65dsi83_brg *brg)
 {
     dev_dbg(&brg->client->dev,"%s\n",__func__);
     gpiod_set_value_cansleep(brg->gpio_enable, 1);
+
     /* Wait for 1ms for the internal voltage regulator to stabilize */
-    msleep(1);
+    msleep(10);
 
     return 0;
 }
