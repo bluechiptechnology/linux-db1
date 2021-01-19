@@ -161,6 +161,15 @@
                 status = "disabled";
             };
 
+            /* EEPROM */
+            mac_eeprom: mac_eeprom@50 {
+                compatible = "atmel,24c04";
+                reg = <0x50>;
+                pagesize = <16>;
+                read-only;
+                status = "okay";
+            };
+
             /* DSI to LVDS bridge */
 			dsi_lvds_bridge: sn65dsi83@2c {
 				compatible = "ti,sn65dsi83";
