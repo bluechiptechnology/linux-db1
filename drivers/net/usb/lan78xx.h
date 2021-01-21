@@ -888,4 +888,30 @@
 #define OTP_TPVSR_VAL			(OTP_BASE_ADDR + 4 * 0x3A)
 #define OTP_TPVHR_VAL			(OTP_BASE_ADDR + 4 * 0x3B)
 #define OTP_TPVSA_VAL			(OTP_BASE_ADDR + 4 * 0x3C)
+
+
+#define ETH_PHY_LED_MODE_SELECT_REG		29
+
+#define LED0_FUNC_SHIFT			0
+#define LED1_FUNC_SHIFT			4
+#define LED2_FUNC_SHIFT			8
+#define LED3_FUNC_SHIFT			12
+
+#define LEDX_FUNC_LINK_ACT			0
+#define LEDX_FUNC_LINK1000_ACT		1
+#define LEDX_FUNC_LINK100_ACT		2
+#define LEDX_FUNC_LINK10_ACT		3
+#define LEDX_FUNC_LINK100_1000_ACT	4
+#define LEDX_FUNC_LINK10_1000_ACT	5
+#define LEDX_FUNC_LINK10_100_ACT	6
+/* 7 reserved */
+#define LEDX_FUNC_DUPLEX_COLLISION	8
+#define LEDX_FUNC_COLLISION  		9
+#define LEDX_FUNC_ACTIVITY  		10
+/* 11 reserved */
+#define LEDX_FUNC_AUTONEG_FAULT		12
+/* 13 reserved */
+#define LEDX_FUNC_FORCE_LED_OFF		14
+#define LEDX_FUNC_FORCE_LED_ON		15
+
 #endif /* _LAN78XX_H */

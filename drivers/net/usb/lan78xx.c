@@ -2513,6 +2513,26 @@ static int lan78xx_reset(struct lan78xx_net *dev)
 	buf |= FCT_RX_CTL_EN_;
 	ret = lan78xx_write_reg(dev, FCT_RX_CTL, buf);
 
+	/* If no valid EEPROM and no valid OTP, configure LED indication functions */
+	if (!has_eeprom && !has_otp) {
+		struct mii_bus bus = {0};
+		int ret;
+		u16 regval;
+
+		bus.priv = dev;
+		regval = (u16) ((LEDX_FUNC_LINK_ACT << LED0_FUNC_SHIFT) |
+			(LEDX_FUNC_LINK1000_ACT << LED1_FUNC_SHIFT) |
+			(LEDX_FUNC_LINK_ACT << LED2_FUNC_SHIFT) |
+			(LEDX_FUNC_DUPLEX_COLLISION << LED3_FUNC_SHIFT));
+		ret = lan78xx_mdiobus_write(&bus, 1, ETH_PHY_LED_MODE_SELECT_REG, regval);
+		if (ret) {
+			netdev_err(dev->net, "LED mode write failed: %i\n", ret);
+		} else {
+			ret = lan78xx_mdiobus_read(&bus, 1, ETH_PHY_LED_MODE_SELECT_REG);
+			netdev_info(dev->net, "LED mode result: %i  (0x%04x)\n", ret, ret);
+		}
+	}
+
 	return 0;
 }
 
