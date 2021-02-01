@@ -62,6 +62,7 @@ struct pm8941_pwrkey {
 
 	u32 code;
 	const struct pm8941_data *data;
+	bool ignore_key;
 };
 
 static int pm8941_reboot_notify(struct notifier_block *nb,
@@ -134,6 +135,12 @@ static irqreturn_t pm8941_pwrkey_irq(int irq, void *_data)
 	if (error)
 		return IRQ_HANDLED;
 
+	if (pwrkey->ignore_key)
+	{
+		pwrkey->ignore_key = false;
+		return IRQ_HANDLED;
+	}
+
 	input_report_key(pwrkey->input, pwrkey->code,
 			 sts & pwrkey->data->status_bit);
 	input_sync(pwrkey->input);
@@ -145,6 +152,7 @@ static int __maybe_unused pm8941_pwrkey_suspend(struct device *dev)
 {
 	struct pm8941_pwrkey *pwrkey = dev_get_drvdata(dev);
 
+	pwrkey->ignore_key = true;
 	if (device_may_wakeup(dev))
 		enable_irq_wake(pwrkey->irq);
 
@@ -188,6 +196,7 @@ static int pm8941_pwrkey_probe(struct platform_device *pdev)
 
 	pwrkey->dev = &pdev->dev;
 	pwrkey->data = of_device_get_match_data(&pdev->dev);
+	pwrkey->ignore_key = false;
 
 	parent = pdev->dev.parent;
 	pwrkey->regmap = dev_get_regmap(parent, NULL);
