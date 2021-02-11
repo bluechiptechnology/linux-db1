@@ -554,7 +554,7 @@
 		led@1 {
 			label = "user1";
 			gpios = <&pm8916_gpios 1 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "none";
+			linux,default-trigger = "heartbeat";
 			default-state = "off";
 		};
 
