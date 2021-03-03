@@ -270,7 +270,7 @@
 		/* On Low speed expansion */
 			label = "LS-SPI0";
 			status = "okay";
-			spi-max-frequency = <4000000>;
+			spi-max-frequency = <2400000>;
 			
 			num-cs = <1>;
 			cs-gpios = <&msmgpio 18 GPIO_ACTIVE_LOW>;
@@ -282,7 +282,7 @@
 				clocks = <&spi2uart_clk>;
 				interrupt-parent = <&msmgpio>;
 				interrupts = <25 IRQ_TYPE_EDGE_FALLING>;
-				spi-max-frequency = <4000000>;
+				spi-max-frequency = <2400000>;
 				pinctrl-names = "default";
 				pinctrl-0 = <&spi2uart_int_active &spi2uart_rs422_enrx_active>;
 				rs422enrx0 = <&msmgpio 73 GPIO_ACTIVE_HIGH>;
