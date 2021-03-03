@@ -547,6 +547,7 @@ static struct clk_rcg2 blsp1_qup1_i2c_apps_clk_src = {
 
 static const struct freq_tbl ftbl_gcc_blsp1_qup1_6_spi_apps_clk[] = {
 	F(960000, P_XO, 10, 1, 2),
+	F(2400000, P_XO, 8, 0, 0),
 	F(4800000, P_XO, 4, 0, 0),
 	F(9600000, P_XO, 2, 0, 0),
 	F(16000000, P_GPLL0, 10, 1, 5),
