@@ -291,6 +291,13 @@ static int sn65dsi83_parse_dt(struct device_node *np,
         return PTR_ERR(sn65dsi83->brg->gpio_enable);
     }
 
+    sn65dsi83->brg->gpio_panel = devm_gpiod_get(dev, "panel", GPIOD_OUT_LOW);
+    if (IS_ERR(sn65dsi83->brg->gpio_panel)) {
+        dev_err(dev, "failed to parse panel gpio");
+        return PTR_ERR(sn65dsi83->brg->gpio_panel);
+    }
+
+
     sn65dsi83->brg->format = format;
     sn65dsi83->brg->bpp = bpp;
 

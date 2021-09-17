@@ -39,6 +39,7 @@
 #define SN65DSI83_CORE_PLL           0x0A
     #define LVDS_CLK_RANGE_SHIFT    1
     #define HS_CLK_SRC_SHIFT        0
+	#define PLL_EN_STAT_MASK        (1 << 7)
 
 #define SN65DSI83_PLL_DIV            0x0B
     #define DSI_CLK_DIV_SHIFT       3
@@ -157,14 +158,25 @@ static int sn65dsi83_brg_start_stream(struct sn65dsi83_brg *brg)
 	int TimeoutCounter = 0;
 
     dev_dbg(&client->dev,"%s\n",__func__);
+
+    /* Enable the LCD Panel */
+    gpiod_set_value_cansleep(brg->gpio_panel, 1);
+    /* Wait for the panel voltage to rise & settle */
+    msleep(5);
+
     /* Set the PLL_EN bit (CSR 0x0D.0) */
     SN65DSI83_WRITE(SN65DSI83_PLL_EN, 0x1);
+
+    /* Init Seq 6 wait */
+    msleep(8);
+
     /* Wait for the PLL_LOCK bit to be set (CSR 0x0A.7) */
 	regval = SN65DSI83_READ(SN65DSI83_CORE_PLL);
 	while (TimeoutCounter < 200)
 	{
-		if (regval & 0x80)
+		if (regval & PLL_EN_STAT_MASK)
 		{
+			/* Wait for PLL to lock */
 			msleep(3);
 			break;
 		}
@@ -182,6 +194,9 @@ static int sn65dsi83_brg_start_stream(struct sn65dsi83_brg *brg)
     /* Perform SW reset to apply changes */
     SN65DSI83_WRITE(SN65DSI83_SOFT_RESET, 0x01);
 
+    /* Init Seq 7 wait */
+    msleep(10);
+
     /* Read CHA Error register */
     regval = SN65DSI83_READ(SN65DSI83_CHA_ERR);
     dev_dbg(&client->dev, "CHA (0x%02x) = 0x%02x",
@@ -194,6 +209,10 @@ static void sn65dsi83_brg_stop_stream(struct sn65dsi83_brg *brg)
 {
     struct i2c_client *client = I2C_CLIENT(brg);
     dev_dbg(&client->dev,"%s\n",__func__);
+
+    /* power-off the LCD */
+    gpiod_set_value_cansleep(brg->gpio_panel, 0);
+
     /* Clear the PLL_EN bit (CSR 0x0D.0) */
     SN65DSI83_WRITE(SN65DSI83_PLL_EN, 0x00);
 }
@@ -291,9 +310,6 @@ static int sn65dsi83_brg_configure(struct sn65dsi83_brg *brg)
         return -EINVAL;
     }
 
-    //regval= 5; // divide by 6
-    //regval = 3; // HACK - divide by 4;
-    //regval = 2; // HACK - divide by 3;
     regval = regval << DSI_CLK_DIV_SHIFT;
     SN65DSI83_WRITE(SN65DSI83_PLL_DIV,regval);
 
