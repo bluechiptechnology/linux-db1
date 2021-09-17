@@ -682,10 +682,10 @@
 		cross_conn_det_act: lines_on {
 			pinmux {
 				function = "gpio";
-				pins = "gpio120";
+				pins = "gpio102";
 			};
 			pinconf {
-				pins = "gpio120";
+				pins = "gpio102";
 				drive-strength = <8>;
 				output-low;
 				bias-pull-down;
@@ -694,10 +694,10 @@
 		cross_conn_det_sus: lines_off {
 			pinmux {
 				function = "gpio";
-				pins = "gpio120";
+				pins = "gpio102";
 			};
 			pinconf {
-				pins = "gpio120";
+				pins = "gpio102";
 				drive-strength = <2>;
 				bias-disable;
 			};

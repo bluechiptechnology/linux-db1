@@ -9,14 +9,14 @@
 	usb_id_default: usb-id-default {
 		pinmux {
 			function = "gpio";
-			pins = "gpio120";
+			pins = "gpio121";
 		};
 
 		pinconf {
-			pins = "gpio120";
+			pins = "gpio121";
 			drive-strength = <8>;
 			input-enable;
-			bias-pull-up;
+			bias-disable;
 		};
 	};
 
@@ -75,6 +75,32 @@
 			bias-disable;
 		};
 	};
+
+	/* SPI2LVDS Panel Enable */
+	sn65dsi83_panel_active: sn65dsi83_panel_active {
+		pinmux {
+			function = "gpio";
+			pins = "gpio120";
+		};
+		pinconf {
+			pins = "gpio120";
+			drive-strength = <8>;
+			output-low;
+		};
+	};
+	
+	sn65dsi83_panel_suspend: sn65dsi83_panel_suspend {
+		pinmux {
+			function = "gpio";
+			pins = "gpio120";
+		};
+		pinconf {
+			pins = "gpio120";
+			drive-strength = <2>;
+			output-low;
+		};
+	};
+
 
 	/* SPI2UART IRQ# */
 	spi2uart_int_active: spi2uart_int_active {

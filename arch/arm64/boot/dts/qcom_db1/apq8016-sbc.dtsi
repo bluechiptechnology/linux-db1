@@ -180,9 +180,10 @@
 				ti,width-mm = <197>;
 				ti,height-mm = <147>;
 				enable-gpios = <&msmgpio 97 GPIO_ACTIVE_HIGH>;
+				panel-gpios = <&msmgpio 120 GPIO_ACTIVE_HIGH>;
 				pinctrl-names = "default", "sleep";
-				pinctrl-0 = <&sn65dsi83_int_active>;
-				pinctrl-1 = <&sn65dsi83_int_suspend>;
+				pinctrl-0 = <&sn65dsi83_int_active &sn65dsi83_panel_active>;
+				pinctrl-1 = <&sn65dsi83_int_suspend &sn65dsi83_panel_suspend>;
 				status = "okay";
 
                 backlight = <&backlight_lcd>;
